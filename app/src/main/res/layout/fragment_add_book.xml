@@ -26,7 +26,7 @@
                 android:saveEnabled="true"
                 android:maxLength="@integer/ean_size"
                 android:maxLines="1"
-                android:hint="@string/input_hint"
+                android:hint="@string/input_hint_online"
                 android:paddingRight="20dp"/>
 
             <Button

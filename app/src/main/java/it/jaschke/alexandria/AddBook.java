@@ -59,31 +59,38 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         ean.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //no need
+                // no need
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //no need
+                //to change the hint if offline while fragment is already created
+                if(!Utility.isNetworkAvailable(getActivity())){
+                    ean.setHint(R.string.input_hint_offline);
+                }else{
+                    ean.setHint(R.string.input_hint_online);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean =s.toString();
-                //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
+                if(Utility.isNetworkAvailable(getActivity())) {
+                    String ean = s.toString();
+                    //catch isbn10 numbers
+                    if (ean.length() == 10 && !ean.startsWith("978")) {
+                        ean = "978" + ean;
+                    }
+                    if (ean.length() < 13) {
+                        clearFields();
+                        return;
+                    }
+                    //Once we have an ISBN, start a book intent
+                    Intent bookIntent = new Intent(getActivity(), BookService.class);
+                    bookIntent.putExtra(BookService.EAN, ean);
+                    bookIntent.setAction(BookService.FETCH_BOOK);
+                    getActivity().startService(bookIntent);
+                    AddBook.this.restartLoader();
                 }
-                if(ean.length()<13){
-                    clearFields();
-                    return;
-                }
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
             }
         });
 

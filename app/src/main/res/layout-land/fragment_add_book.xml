@@ -17,7 +17,7 @@
             android:saveEnabled="true"
             android:textIsSelectable="false"
             android:maxLength="@integer/ean_size"
-            android:hint="@string/input_hint"
+            android:hint="@string/input_hint_online"
             android:layout_marginLeft="40dp"
             android:layout_marginStart="40dp"
             android:maxLines="1"
