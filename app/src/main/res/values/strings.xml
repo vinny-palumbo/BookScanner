@@ -13,6 +13,7 @@
     <string name="scan_button">Scan</string>
     <string name="input_hint_online">Insert ISBN-13. Digits only.</string>
     <string name="input_hint_offline">Internet connection is offline</string>
+    <string name="scanner_prompt">Scan the book\'s barcode.</string>
     <string name="book_cover">Bookcover</string>
 
     <string name="ok_button">Next</string>
