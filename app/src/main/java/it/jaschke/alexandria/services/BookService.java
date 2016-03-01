@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -16,6 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -37,6 +40,17 @@ public class BookService extends IntentService {
     public static final String DELETE_BOOK = "it.jaschke.alexandria.services.action.DELETE_BOOK";
 
     public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({BOOK_STATUS_OK, BOOK_STATUS_SERVER_DOWN, BOOK_STATUS_SERVER_INVALID, BOOK_STATUS_UNKNOWN})
+    public @interface BookStatus {}
+
+    public static final int BOOK_STATUS_OK = 0;
+    public static final int BOOK_STATUS_SERVER_DOWN = 1;
+    public static final int
+            BOOK_STATUS_SERVER_INVALID = 2;
+    public static final int
+            BOOK_STATUS_UNKNOWN = 3;
 
     public BookService() {
         super("Alexandria");
