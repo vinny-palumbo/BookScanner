@@ -2,9 +2,12 @@ package it.jaschke.alexandria.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -139,11 +142,16 @@ public class BookService extends IntentService {
             }
 
             if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                setBookStatus(BookService.this, BOOK_STATUS_SERVER_DOWN);
                 return;
             }
             bookJsonString = buffer.toString();
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the book data, there's no point in attempting
+            // to parse it.
+            setBookStatus(BookService.this, BOOK_STATUS_SERVER_DOWN);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -210,8 +218,12 @@ public class BookService extends IntentService {
                 writeBackCategories(ean,bookInfo.getJSONArray(CATEGORIES) );
             }
 
+            setBookStatus(BookService.this, BOOK_STATUS_OK);
+
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+            setBookStatus(BookService.this, BOOK_STATUS_SERVER_INVALID);
         }
     }
 
@@ -243,5 +255,18 @@ public class BookService extends IntentService {
             getContentResolver().insert(AlexandriaContract.CategoryEntry.CONTENT_URI, values);
             values= new ContentValues();
         }
+    }
+
+    /**
+     * Sets the book status into shared preference.  This function should not be called from
+     * the UI thread because it uses commit to write to the shared preferences.
+     * @param c Context to get the PreferenceManager from.
+     * @param bookStatus The IntDef value to set
+     */
+    static private void setBookStatus(Context c, @BookStatus int bookStatus){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(c.getString(R.string.pref_book_status_key), bookStatus);
+        spe.commit();
     }
  }
