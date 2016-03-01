@@ -66,12 +66,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanResult != null) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) throws NullPointerException{
+        IntentResult scanResult = null;
+        try {
+            scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
             String scannedCode = scanResult.getContents();
             Log.d("barcode - result", scannedCode);
             AddBook.getEan().setText(scannedCode);
+        } catch (NullPointerException e) {
+            System.out.print("Caught the NullPointerException");
         }
     }
 
